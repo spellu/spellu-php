@@ -1,0 +1,31 @@
+{
+    "name": "spellu/spellu",
+    "type": "language",
+    "description": "Application write language on PHP.",
+    "license": "MIT",
+    "keywords": ["language", "script", "php"],
+    "homepage": "https://jumilla.me",
+    "authors": [
+        {
+            "name": "Fumio Furukawa",
+            "email": "fumio@jumilla.me"
+        }
+    ],
+    "require": {
+        "nikic/php-parser": "^2.1"
+    },
+    "require-dev": {
+        "spellu/spellu-php-test": "dev-develop",
+        "phpunit/phpunit": "~5.0",
+        "mockery/mockery": "~0.9"
+    },
+    "autoload": {
+        "psr-4": {
+            "Spellu\\": "sources/"
+        },
+        "files": [
+            "sources/helpers.php"
+        ]
+    },
+    "minimum-stability": "stable"
+}

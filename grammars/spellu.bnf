@@ -1,0 +1,43 @@
+
+Statement ::=
+	StatementBind
+	StatementAssgin
+	StatementExpression
+	StatementBlock
+
+StatementBind ::=
+	'let' Identifier '=' Expression ';'
+
+StatementExpression ::=
+	Expression ';'
+
+StatementBlock ::=
+	'{' StatementList '}'
+StatementList ::=
+	Statement | Statement ',' StatementList
+
+Expression ::=
+	BinaryExpression
+	UnaryExpression
+	PrimaryExpression
+
+PostfixExpression ::=
+	PrimaryExpression
+	PostfixExpression '(' ArgumentList ')'
+	PostfixExpression '.' Identifier
+	PostfixExpression '[' Expression ']'
+	PostfixExpression '{' StatementList '}'
+
+PrimaryExpression ::=
+	Identifier
+	Literal
+	ExpressionList
+
+ExpressionList ::= '(' ExpressionElement? ')'
+ExpressionElementList ::= Expression | Expression ',' ExpressionElementList
+
+
+Identifier ::= IdentifierFirstCharacter (IdentifierNoneFirstCharacter)*
+
+IdentifierFirstCharacter ::= '$' | '_' | [alphabet]
+IdentifierNoneFirstCharacter :: = '_' | [alphabet] | [number]
