@@ -77,16 +77,23 @@ class Lexer
 			case ' ':
 			case '　':
 				return $this->consumeSpace();
-			case '.': return Token::PERIOD;
+			case '.':
+				if ($this->stream->nextIf('.')) {
+					return $this->stream->nextIf('.') ? Token::PERIOD3 : Token::PERIOD2;
+				}
+				return Token::PERIOD;
 			case '+': return Token::PLUS;
 			case '-': return Token::MINUS;
 			case '*': return Token::ASTERISK;
 			case '/':
-				if ($this->nextStringIf('/')) return $this->consumeLineComment();
-				if ($this->nextStringIf('*')) return $this->consumeBlockComment();
+				if ($this->stream->nextIf('/')) return $this->consumeLineComment();
+				if ($this->stream->nextIf('*')) return $this->consumeBlockComment();
 				return Token::SLASH;
 			case '*': return Token::ASTERISK;
 			case '%': return Token::PERCENT;
+			case '?': return Token::QUESTION;
+			case '!': return Token::EXCLAMATION;
+			case '&': return Token::AMPERSAND;
 			case ',': return Token::COMMA;
 			case ':': return Token::COLON;
 			case ';': return Token::SEMICOLON;
