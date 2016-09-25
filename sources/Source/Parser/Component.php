@@ -8,13 +8,26 @@ use Spellu\SourceException;
 
 trait Component
 {
+	protected function parseDottedName()
+	{
+		$names = [];
+
+		do {
+			if (! $this->nextTokenIf(Token::WORD)) {
+				throw new SourceException('Expected <WORD>');
+			}
+
+			$names[] = $this->token;
+		} while ($this->nextTokenIf(Token::PERIOD));
+
+		return $names;
+	}
+
 	protected function parseClass()
 	{
-		if (! $this->nextTokenIf(Token::WORD)) {
-			throw new SourceException('Expected <WORD>');
-		}
+		$name = $this->parseDottedName();
 
-		$name = $this->token;
+		// TODO extends, implements
 
 		if (! $this->nextTokenIf(Token::L_BRACE)) {
 			throw new SourceException('Expected {');

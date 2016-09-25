@@ -231,16 +231,6 @@ class GeneratorTests extends TestCase
 		Assert::equals($script, $this->generate($source));
 	}
 
-	public function _test_identifier_1()
-	{
-		$source = 'PhpParser';
-		$script = <<<EOS
-'hoge';
-EOS;
-
-		Assert::equals($script, $this->generate($source));
-	}
-
 	/** @test */
 	function class_1()
 	{
@@ -251,6 +241,42 @@ EOS;
 		$script = <<<EOS
 class ABC
 {
+}
+EOS;
+
+		Assert::equals($script, $this->generate($source));
+	}
+
+	/** @test */
+	function class_2()
+	{
+		$source = <<<EOS
+class ABC.DEF {
+}
+EOS;
+		$script = <<<EOS
+namespace ABC {
+    class DEF
+    {
+    }
+}
+EOS;
+
+		Assert::equals($script, $this->generate($source));
+	}
+
+	/** @test */
+	function class_3()
+	{
+		$source = <<<EOS
+class ABC.DEF.GHI {
+}
+EOS;
+		$script = <<<EOS
+namespace ABC\DEF {
+    class GHI
+    {
+    }
 }
 EOS;
 
@@ -348,12 +374,12 @@ EOS;
 	}
 
 	/** @test */
-	function class_4()
+	function method_5()
 	{
 		$source = <<<EOS
 class ABC {
 	func a() {
-		let b = 6
+		let b = 62
 	}
 }
 EOS;
@@ -362,7 +388,7 @@ class ABC
 {
     function a()
     {
-        \$b = 6;
+        \$b = 62;
     }
 }
 EOS;

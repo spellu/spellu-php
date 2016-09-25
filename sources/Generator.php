@@ -2,8 +2,6 @@
 
 namespace Spellu;
 
-use PhpParser\PrettyPrinter\Standard as SourcePrinter;
-
 class Generator
 {
 	public function __construct(Platform\Environment $env)

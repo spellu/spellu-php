@@ -51,12 +51,31 @@ class Converter
 			$statements[] = $this->visit($member);
 		}
 
-		return new PHPStmt\Class_($node->name->string, [
+		if (count($node->name) == 1) {
+			$namespace_tokens = null;
+			$class_token = $node->name[0];
+		}
+		else {
+			$namespace_tokens = $node->name;
+			$class_token = array_pop($namespace_tokens);
+		}
+
+		$class_stmt = new PHPStmt\Class_($class_token->string, [
 			'type' => 0,
 			'extends' => null,
 			'implements' => [],
 			'stmts' => $statements,
 		]);
+
+		if ($namespace_tokens) {
+			$namespace = new PHPName(array_map(function ($token) {
+				return $token->string;
+			}, $namespace_tokens));
+			return new PHPStmt\Namespace_($namespace, [$class_stmt]);
+		}
+		else {
+			return $class_stmt;
+		}
 	}
 
 	protected function visitComponentMethod($node)
