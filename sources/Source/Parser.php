@@ -48,6 +48,11 @@ class Parser
 		}
 	}
 
+	protected function currentToken()
+	{
+		return $this->token = $this->stream->current();
+	}
+
 	protected function nextToken()
 	{
 		$this->token = $this->stream->current();
@@ -55,6 +60,17 @@ class Parser
 		$this->stream->next();
 
 		return $this->token;
+	}
+
+	protected function currentTokenIf(...$types)
+	{
+		$token = $this->token = $this->stream->current();
+
+		if (in_array($token->type, $types)) {
+			return true;
+		}
+
+		return false;
 	}
 
 	protected function nextTokenIf(...$types)

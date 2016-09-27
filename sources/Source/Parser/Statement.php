@@ -23,6 +23,17 @@ trait Statement
 
 			$node = new SyntaxTree\StmtBind($left, $this->parseExpression());
 		}
+		else if ($this->nextTokenIfWord('if')) {
+		}
+		else if ($this->nextTokenIfWord('do')) {
+		}
+		else if ($this->nextTokenIfWord('while')) {
+		}
+		else if ($this->nextTokenIfWord('for')) {
+		}
+		else if ($this->nextTokenIfWord('return')) {
+			$node = new SyntaxTree\StmtExpr($this->parseExpression());
+		}
 		else {
 			$node = new SyntaxTree\StmtExpr($this->parseExpression());
 		}

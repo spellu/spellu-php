@@ -25,20 +25,28 @@ trait Component
 
 	protected function parseClass()
 	{
+		$name = null;
+		$components = [];
+		$members = [];
+
 		$name = $this->parseDottedName();
 
-		// TODO extends, implements
+		// extends, implements, with(use)
+		if ($this->nextTokenIf(Token::COLON)) {
+			do {
+				$components[] = $this->parseDottedName();
+			} while ($this->nextTokenIf(Token::COMMA));
+		}
 
 		if (! $this->nextTokenIf(Token::L_BRACE)) {
 			throw new SourceException('Expected {');
 		}
 
-		$members = [];
 		while (! $this->nextTokenIf(Token::R_BRACE)) {
 			$members[] = $this->parseMember();
 		}
 
-		return new SyntaxTree\ComponentClass($name, [], $members);
+		return new SyntaxTree\ComponentClass($name, $components, $members);
 	}
 
 	protected function parseMember()
@@ -79,18 +87,10 @@ trait Component
 
 		$parameters = $this->parseParameterList();
 
-		if (! $this->nextTokenIf(Token::L_BRACE)) {
-			throw new SourceException('Expected {');
-		}
-
-		$statements = [];
-		while (! $this->nextTokenIf(Token::R_BRACE)) {
-			$statements[] = $this->parseStatement();
-		}
+		$statements = $this->parseStatementList();
 
 		return new SyntaxTree\ComponentMethod($name, $parameters, $statements);
 	}
-
 
 	protected function parseParameterList()
 	{
@@ -128,5 +128,20 @@ trait Component
 		}
 
 		return $parameters;
+	}
+
+	protected function parseStatementList()
+	{
+		$statements = [];
+
+		if (! $this->nextTokenIf(Token::L_BRACE)) {
+			throw new SourceException('Expected {');
+		}
+
+		while (! $this->nextTokenIf(Token::R_BRACE)) {
+			$statements[] = $this->parseStatement();
+		}
+
+		return $statements;
 	}
 }

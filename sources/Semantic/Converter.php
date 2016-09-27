@@ -46,7 +46,42 @@ class Converter
 
 	protected function visitComponentClass($node)
 	{
+		$extends = null;
+		$implements = [];
+		$includes = [];
 		$statements = [];
+
+		$resolver = new SymbolResolver($this->env);
+
+		foreach ($node->components as $component) {
+			$symbol = $resolver->resolveName($component);
+
+			if ($symbol instanceof SymbolClass) {
+				$extends = new PHPName(array_map(function ($token) {
+					return $token->string;
+				}, $component));
+			}
+			else if ($symbol instanceof SymbolInterface) {
+				$implements[] = new PHPName(array_map(function ($token) {
+					return $token->string;
+				}, $component));
+			}
+			else if ($symbol instanceof SymbolTrait) {
+				$name = new PHPName(array_map(function ($token) {
+					return $token->string;
+				}, $component));
+
+				$includes[] = new PHPStmt\UseUse($name, null);
+			}
+			else {
+				throw new SemanticException('not class, interface, trait');
+			}
+		}
+
+		if (count($includes) > 0) {
+			$statements[] = new PHPStmt\Use_($includes);
+		}
+
 		foreach ($node->members as $member) {
 			$statements[] = $this->visit($member);
 		}
@@ -62,8 +97,8 @@ class Converter
 
 		$class_stmt = new PHPStmt\Class_($class_token->string, [
 			'type' => 0,
-			'extends' => null,
-			'implements' => [],
+			'extends' => $extends,
+			'implements' => $implements,
 			'stmts' => $statements,
 		]);
 
@@ -77,6 +112,17 @@ class Converter
 			return $class_stmt;
 		}
 	}
+
+/*
+	protected function resolveSymbol($tokens)
+	{
+		$resolver = new SymbolResolver($this->env);
+
+		$node = $resolver->resolve($node);
+
+		return $this->visit($node);
+	}
+*/
 
 	protected function visitComponentMethod($node)
 	{
@@ -128,7 +174,7 @@ class Converter
 
 	protected function visitTerm($node)
 	{
-		$resolver = new SymbolResolver($this->env, []);
+		$resolver = new SymbolResolver($this->env);
 
 		$node = $resolver->resolve($node);
 
@@ -290,5 +336,10 @@ var_dump(4, $code);
 	protected function visitLiteralDictionary($node)
 	{
 		echo __METHOD__, PHP_EOL;
+	}
+
+	protected function visitClosure($node)
+	{
+		return new PHPScalar\String_($node->value());
 	}
 }

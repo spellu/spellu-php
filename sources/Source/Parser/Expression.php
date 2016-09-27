@@ -111,6 +111,12 @@ trait Expression
 				case 'false':
 					$this->token->type = Token::FALSE;
 					return new SyntaxTree\Literal($this->token);
+				case 'self':
+				case 'this':
+					// TODO
+					return null;
+				case 'func':
+					return $this->parseClosure();
 				default:
 					return new SyntaxTree\Identifier($this->token);
 			}
@@ -195,5 +201,26 @@ trait Expression
 		}
 
 		return $list;
+	}
+
+	protected function parseClosure()
+	{
+		$name = null;
+		$parameters = [];
+		$statements = [];
+
+		// Optional: name
+		if ($this->nextTokenIf(Token::WORD)) {
+			$name = $this->token;
+		}
+
+		// Optional: ()
+		if ($this->currentTokenIf(Token::L_PAREN)) {
+			$parameters = $this->parseParameterList();
+		}
+
+		$statements = $this->parseStatementList();
+
+		return new SyntaxTree\Closure($name, $parameters, $statements);
 	}
 }

@@ -232,12 +232,9 @@ class GeneratorTests extends TestCase
 	}
 
 	/** @test */
-	function class_1()
+	function class_definition_global()
 	{
-		$source = <<<EOS
-class ABC {
-}
-EOS;
+		$source = 'class ABC {}';
 		$script = <<<EOS
 class ABC
 {
@@ -248,12 +245,9 @@ EOS;
 	}
 
 	/** @test */
-	function class_2()
+	function class_definition_namespaced()
 	{
-		$source = <<<EOS
-class ABC.DEF {
-}
-EOS;
+		$source = 'class ABC.DEF {}';
 		$script = <<<EOS
 namespace ABC {
     class DEF
@@ -266,16 +260,111 @@ EOS;
 	}
 
 	/** @test */
-	function class_3()
+	function class_definition_namespaced_multiple()
 	{
-		$source = <<<EOS
-class ABC.DEF.GHI {
-}
-EOS;
+		$source = 'class ABC.DEF.GHI {}';
 		$script = <<<EOS
 namespace ABC\DEF {
     class GHI
     {
+    }
+}
+EOS;
+
+		Assert::equals($script, $this->generate($source));
+	}
+
+	/** @test */
+	function class_extends_global()
+	{
+		$source = 'class Spellu.Test.ABC : ClassGlobal {}';
+		$script = <<<EOS
+namespace Spellu\Test {
+    class ABC extends ClassGlobal
+    {
+    }
+}
+EOS;
+
+		Assert::equals($script, $this->generate($source));
+	}
+
+	/** @test */
+	function class_extends_namespaced()
+	{
+		$source = 'class Spellu.Test.ABC : Spellu.Test.ClassNamespaced {}';
+		$script = <<<EOS
+namespace Spellu\Test {
+    class ABC extends Spellu\Test\ClassNamespaced
+    {
+    }
+}
+EOS;
+
+		Assert::equals($script, $this->generate($source));
+	}
+
+	/** @test */
+	function class_implements_interface()
+	{
+		$source = 'class Spellu.Test.ABC : InterfaceGlobal {}';
+		$script = <<<EOS
+namespace Spellu\Test {
+    class ABC implements InterfaceGlobal
+    {
+    }
+}
+EOS;
+
+		Assert::equals($script, $this->generate($source));
+	}
+
+	/** @test */
+	function class_implements_interface_namespaced_and_multiple()
+	{
+		$source = 'class Spellu.Test.ABC : InterfaceGlobal, Spellu.Test.InterfaceNamespaced {}';
+		$script = <<<EOS
+namespace Spellu\Test {
+    class ABC implements InterfaceGlobal, Spellu\Test\InterfaceNamespaced
+    {
+    }
+}
+EOS;
+
+		Assert::equals($script, $this->generate($source));
+	}
+
+	/** @test */
+	function class_include_trait()
+	{
+		$source = <<<EOS
+class Spellu.Test.ABC : TraitGlobal {
+}
+EOS;
+		$script = <<<EOS
+namespace Spellu\Test {
+    class ABC
+    {
+        use TraitGlobal;
+    }
+}
+EOS;
+
+		Assert::equals($script, $this->generate($source));
+	}
+
+	/** @test */
+	function class_include_trait_namespaced_and_multiple()
+	{
+		$source = <<<EOS
+class Spellu.Test.ABC : TraitGlobal, Spellu.Test.TraitNamespaced {
+}
+EOS;
+		$script = <<<EOS
+namespace Spellu\Test {
+    class ABC
+    {
+        use TraitGlobal, Spellu\Test\TraitNamespaced;
     }
 }
 EOS;

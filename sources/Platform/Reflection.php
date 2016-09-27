@@ -17,7 +17,7 @@ class Reflection
 			return $this->reflection->{$property};
 		}
 		else {
-			throw new \BadMethodCallException($method);
+			throw new \BadMethodCallException($property);
 		}
 	}
 
