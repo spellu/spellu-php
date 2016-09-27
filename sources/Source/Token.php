@@ -27,9 +27,11 @@ class Token
 	const COLON = 41;		// :
 	const SEMICOLON = 42;	// ;
 	const ARROW = 43;		// ->
-	const EQUAL = 50;
-	const EQUAL_PLUS = 51;
-	const EQUAL_MINUS = 52;
+	const EQUAL = 50;				// =
+	const EQUAL_PLUS = 51;			// +=
+	const EQUAL_MINUS = 52;			// -=
+	const EQUAL_ASTERISK = 53;		// *=
+	const EQUAL_SLASH = 54;			// /=
 	const L_PAREN = 61;		// (
 	const R_PAREN = 62;		// )
 	const L_BRACKET = 63;	// [
