@@ -5,6 +5,7 @@ namespace Spellu\Semantic;
 use Spellu\Platform\Environment;
 use Spellu\Source\Token;
 use Spellu\SyntaxTree\Node;
+use Spellu\SyntaxTree\Closure as ASTClosure;
 use PhpParser\BuilderFactory;
 use PhpParser\Node\Stmt as PHPStmt;
 use PhpParser\Node\Expr as PHPExpr;
@@ -42,6 +43,19 @@ class Converter
 	protected function visit($node)
 	{
 		return $this->{'visit'.$node->type()}($node);
+	}
+
+	protected function visitComponentConstant($node)
+	{
+	}
+
+	protected function visitComponentFunction($node)
+	{
+		return new PHPStmt\Function_($node->name->string, [
+			'params' => [],
+			'returnType' => null,
+			'stmts' => [],
+		]);
 	}
 
 	protected function visitComponentClass($node)
@@ -174,11 +188,24 @@ class Converter
 
 	protected function visitTerm($node)
 	{
-		$resolver = new SymbolResolver($this->env);
+		if ($node->object instanceof ASTClosure) {
+			$code = $this->visitClosure($node->object);
 
-		$node = $resolver->resolve($node);
+			$postfix = $node->postfix;
+			while ($postfix) {
+				$code = $this->visitTermPostfix($code, $postfix);
+				$postfix = $postfix->next;
+			}
 
-		return $this->visit($node);
+			return $code;
+		}
+		else {
+			$resolver = new SymbolResolver($this->env);
+
+			$node = $resolver->resolve($node);
+
+			return $this->visit($node);
+		}
 	}
 
 	protected function visitSymbol($node)
@@ -340,6 +367,13 @@ var_dump(4, $code);
 
 	protected function visitClosure($node)
 	{
-		return new PHPScalar\String_($node->value());
+		assert($node->name === null);
+
+		return new PHPExpr\Closure([
+			'params' => [],
+			'uses' => [],
+			'returnType' => null,
+			'stmts' => [],
+		]);
 	}
 }

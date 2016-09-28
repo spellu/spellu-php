@@ -182,7 +182,9 @@ trait Expression
 		}
 
 		// 構文エラー
-		throw new SourceException('Expcted IDENTIFIER|LITERAL|(');
+		var_dump($this->token);
+		var_dump($this->nextToken());
+		throw new SourceException('Expected IDENTIFIER|LITERAL|(');
 	}
 
 	protected function parseExpressionList($terminateTokenType)

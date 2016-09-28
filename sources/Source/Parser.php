@@ -27,6 +27,9 @@ class Parser
 			if ($this->nextTokenIfWord('class')) {
 				$ast[] = $this->parseClass();
 			}
+			else if ($this->nextTokenIfWord('func')) {
+				$ast[] = $this->parseFunction();
+			}
 			else {
 				$ast[] = $this->parseStatement();
 			}

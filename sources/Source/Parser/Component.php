@@ -23,6 +23,27 @@ trait Component
 		return $names;
 	}
 
+	protected function parseFunction()
+	{
+		$name = null;
+		$parameters = [];
+		$statements = [];
+
+		// Required: name
+		if (! $this->nextTokenIf(Token::WORD)) {
+			throw new SourceException('Expected <WORD>');
+		}
+		$name = $this->token;
+
+		// Required: ()
+		$parameters = $this->parseParameterList();
+
+		// Required: {}
+		$statements = $this->parseStatementList();
+
+		return new SyntaxTree\ComponentFunction($name, $parameters, $statements);
+	}
+
 	protected function parseClass()
 	{
 		$name = null;

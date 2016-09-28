@@ -44,10 +44,6 @@ EOS;
 		$source = <<<EOS
 func addNumber(number) {
 	let sum = 0
-	return func {
-		sum += number
-		return sum
-	}
 }
 EOS;
 		$script = <<<EOS
