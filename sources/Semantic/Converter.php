@@ -202,6 +202,7 @@ class Converter
 	{
 		$left = $this->visit($node->left);
 		$right = $this->visit($node->right);
+		// TODO
 		return new PHPExpr\BinaryOp\Plus($left, $right);
 	}
 

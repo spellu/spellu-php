@@ -17,7 +17,7 @@ trait Statement
 
 			$left = $this->token;
 
-			if (! $this->nextTokenIf(Token::EQUAL)) {
+			if (! $this->nextTokenIfOperator('=')) {
 				throw new SourceException('Expected =');
 			}
 
@@ -36,12 +36,6 @@ trait Statement
 		}
 		else {
 			$node = new SyntaxTree\StatementExpression($this->parseExpression());
-
-			if ($this->nextTokenIf(Token::EQUAL)) {
-				$left = $node;
-				$right = new SyntaxTree\StatementExpression($this->parseExpression());
-				$node = new SyntaxTree\StatementBind($left, $right);
-			}
 		}
 
 		while ($this->nextTokenIf(Token::SEMICOLON)) {

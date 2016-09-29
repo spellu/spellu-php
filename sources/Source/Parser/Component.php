@@ -90,7 +90,7 @@ trait Component
 
 		$name = $this->token;
 
-		if (! $this->nextTokenIf(Token::EQUAL)) {
+		if (! $this->nextTokenIfOperator('=')) {
 			throw new SourceException('Expected =');
 		}
 
@@ -136,7 +136,7 @@ trait Component
 				$type = $this->token;
 			}
 
-			if ($this->nextTokenIf(Token::EQUAL)) {
+			if ($this->nextTokenIfOperator('=')) {
 				$default = $this->parseExpression();
 			}
 

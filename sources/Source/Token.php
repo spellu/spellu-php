@@ -4,6 +4,8 @@ namespace Spellu\Source;
 
 class Token
 {
+	const OPERATOR_SIGNS = ['=', '-', '+', '!', '*', '/', '%', '<', '>', '&', '|', '^', '?', '~'];
+
 	const EOF = 0;
 	const WORD = 11;
 	const NIL = 12;
