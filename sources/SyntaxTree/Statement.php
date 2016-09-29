@@ -2,6 +2,6 @@
 
 namespace Spellu\SyntaxTree;
 
-abstract class Stmt extends Node
+abstract class Statement extends Node
 {
 }

@@ -2,7 +2,7 @@
 
 namespace Spellu\SyntaxTree;
 
-class StmtBind extends Stmt
+class StatementBind extends Statement
 {
 	public $name;
 	public $expr;

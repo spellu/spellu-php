@@ -45,16 +45,31 @@ class Converter
 		return $this->{'visit'.$node->type()}($node);
 	}
 
+	protected function convertNodeList($nodes)
+	{
+		$codes = [];
+
+		foreach ($nodes as $node) {
+			$codes[] = $this->visit($node);
+		}
+
+		return $codes;
+	}
+
 	protected function visitComponentConstant($node)
 	{
 	}
 
 	protected function visitComponentFunction($node)
 	{
-		return new PHPStmt\Function_($node->name->string, [
-			'params' => [],
+		$name = $node->name->string;
+		$parameters = $this->convertNodeList($node->parameters);
+		$statements = $this->convertNodeList($node->statements);
+
+		return new PHPStmt\Function_($name, [
+			'params' => $parameters,
 			'returnType' => null,
-			'stmts' => [],
+			'stmts' => $statements,
 		]);
 	}
 
@@ -140,17 +155,11 @@ class Converter
 
 	protected function visitComponentMethod($node)
 	{
-		$parameters = [];
-		foreach ($node->parameters as $parameter) {
-			$parameters[] = $this->visit($parameter);
-		}
+		$name = $node->name->string;
+		$parameters = $this->convertNodeList($node->parameters);
+		$statements = $this->convertNodeList($node->statements);
 
-		$statements = [];
-		foreach ($node->statements as $statement) {
-			$statements[] = $this->visit($statement);
-		}
-
-		return new PHPStmt\ClassMethod($node->name->string, [
+		return new PHPStmt\ClassMethod($name, [
 			'type' => 0,
 			'byRef' => false,
 			'params' => $parameters,
@@ -168,13 +177,23 @@ class Converter
 		return new PHPParameter($node->name->string, $default, $type);
 	}
 
-	protected function visitStmtBind($node)
+	protected function visitStatementBind($node)
 	{
+		$name = $node->name->string;
 		$expr = $this->visit($node->expr);
-		return new PHPExpr\Assign(new PHPExpr\Variable($node->name->string), $expr);
+
+		return new PHPExpr\Assign(new PHPExpr\Variable($name), $expr);
 	}
 
-	protected function visitStmtExpr($node)
+	protected function visitStatementReturn($node)
+	{
+//var_dump($node);
+		$expr = $this->visit($node->expr);
+
+		return new PHPStmt\Return_($expr);
+	}
+
+	protected function visitStatementExpression($node)
 	{
 		return $this->visit($node->expr);
 	}
@@ -369,11 +388,14 @@ var_dump(4, $code);
 	{
 		assert($node->name === null);
 
+		$parameters = $this->convertNodeList($node->parameters);
+		$statements = $this->convertNodeList($node->statements);
+
 		return new PHPExpr\Closure([
-			'params' => [],
+			'params' => $parameters,
 			'uses' => [],
 			'returnType' => null,
-			'stmts' => [],
+			'stmts' => $statements,
 		]);
 	}
 }
