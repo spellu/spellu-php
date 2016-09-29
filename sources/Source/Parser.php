@@ -99,4 +99,16 @@ class Parser
 
 		return false;
 	}
+
+	protected function nextTokenIfOperator(...$operators)
+	{
+		$token = $this->token = $this->stream->current();
+
+		if ($token->type == Token::OPERATOR && in_array($token->string, $operators)) {
+			$this->stream->next();
+			return true;
+		}
+
+		return false;
+	}
 }

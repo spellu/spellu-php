@@ -2,7 +2,7 @@
 
 namespace Spellu\SyntaxTree;
 
-class Symbol extends Expr
+class Symbol extends Node
 {
 	public $symbol;
 	public $postfix;

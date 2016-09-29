@@ -198,7 +198,7 @@ class Converter
 		return $this->visit($node->expr);
 	}
 
-	protected function visitExprBinary($node)
+	protected function visitExpressionBinary($node)
 	{
 		$left = $this->visit($node->left);
 		$right = $this->visit($node->right);

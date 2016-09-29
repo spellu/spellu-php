@@ -7,7 +7,7 @@ use Spellu\Generator;
 /**
  * @group unit
  */
-class GeneratorExpressionTests extends TestCase
+class GeneratorStatementTests extends TestCase
 {
 	function setUp()
 	{
@@ -27,50 +27,34 @@ class GeneratorExpressionTests extends TestCase
 	}
 
 	/** @test */
-	function closure_1()
+	function assignment_1()
 	{
-		$source = 'let a = func () {}';
+		$source = 'a = 1';
 		$script = <<<EOS
-\$a = function () {
-};
+\$a = 1;
 EOS;
 
 		Assert::equals($script, $this->generate($source));
 	}
 
 	/** @test */
-	function closure_2()
+	function return_1()
 	{
-		$source = 'let a = func {}';
+		$source = 'return 1';
 		$script = <<<EOS
-\$a = function () {
-};
+return 1;
 EOS;
 
 		Assert::equals($script, $this->generate($source));
 	}
 
 	/** @test */
-	function closure_final()
+	function return_2()
 	{
-		$source = <<<EOS
-func addNumber(number) {
-	let sum = 0
-	return func {
-		sum = sum + number
-		return sum
-	}
-}
-EOS;
+		$source = 'return func () {}';
 		$script = <<<EOS
-function addNumber(\$number)
-{
-    \$sum = 0;
-    return function () use (&\$sum, \$number) {
-        \$sum += \$number;
-        return \$sum;
-    };
-}
+return function () {
+};
 EOS;
 
 		Assert::equals($script, $this->generate($source));

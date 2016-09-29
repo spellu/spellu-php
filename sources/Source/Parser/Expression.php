@@ -20,7 +20,7 @@ trait Expression
 		while ($this->nextTokenIf(Token::PLUS, Token::MINUS)) {
 			$operator = $this->token;
 			$right = $this->parseExpressionBinary2();
-			$node = new SyntaxTree\ExprBinary($node, $right, $operator);
+			$node = new SyntaxTree\ExpressionBinary($operator, $node, $right);
 		}
 
 		return $node;
@@ -33,7 +33,7 @@ trait Expression
 		while ($this->nextTokenIf(Token::ASTERISK, Token::SLASH)) {
 			$operator = $this->token;
 			$right = $this->parseTerm();
-			$node = new SyntaxTree\ExprBinary($node, $right, $operator);
+			$node = new SyntaxTree\ExpressionBinary($operator, $node, $right);
 		}
 
 		return $node;

@@ -12,26 +12,13 @@ class Token
 	const INTEGER = 15;
 	const REAL = 16;
 	const STRING = 17;
-	const PERIOD = 31;		// .
-	const PERIOD2 = 101;	// ..
-	const PERIOD3 = 102;	// ...
-	const PLUS = 32;		// +
-	const MINUS = 33;		// -
-	const ASTERISK = 34;	// *
-	const SLASH = 35;		// /
-	const PERCENT = 36;		// %
-	const QUESTION = 37;	// ?
-	const EXCLAMATION = 38;	// !
-	const AMPERSAND = 39;	// &
-	const COMMA = 40;		// ,
-	const COLON = 41;		// :
-	const SEMICOLON = 42;	// ;
-	const ARROW = 43;		// ->
-	const EQUAL = 50;				// =
-	const EQUAL_PLUS = 51;			// +=
-	const EQUAL_MINUS = 52;			// -=
-	const EQUAL_ASTERISK = 53;		// *=
-	const EQUAL_SLASH = 54;			// /=
+	const OPERATOR = 31;	// =, -, +, !, *, /, %, <, >, &, |, ^, ?, ~
+	const PERIOD = 32;		// .
+	const PERIOD2 = 33;		// ..
+	const PERIOD3 = 34;		// ...
+	const COMMA = 41;		// ,
+	const COLON = 42;		// :
+	const SEMICOLON = 43;	// ;
 	const L_PAREN = 61;		// (
 	const R_PAREN = 62;		// )
 	const L_BRACKET = 63;	// [

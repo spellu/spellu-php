@@ -2,7 +2,7 @@
 
 namespace Spellu\SyntaxTree;
 
-class Term extends Expr
+class Term extends Node
 {
 	public $object;	// Literal, Identifier, Expression
 	public $postfix;
