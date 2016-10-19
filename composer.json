@@ -12,6 +12,8 @@
         }
     ],
     "require": {
+        "php": "^7.0",
+        "spellu/dsl": "dev-develop",
         "nikic/php-parser": "^2.1"
     },
     "require-dev": {
@@ -20,9 +22,9 @@
         "mockery/mockery": "~0.9"
     },
     "autoload": {
-        "psr-4": {
-            "Spellu\\": "sources/"
-        },
+        "classmap": [
+            "sources"
+        ],
         "files": [
             "sources/helpers.php"
         ]

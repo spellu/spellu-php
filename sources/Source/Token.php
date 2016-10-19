@@ -30,6 +30,21 @@ class Token
 	const SPACE = 91;
 	const COMMENT = 92;
 
+/*
+	const KEYWORD_IF = 10;
+	const KEYWORD_ELSE = ;
+	const KEYWORD_DO = ;
+	const KEYWORD_WHILE = ;
+	const KEYWORD_FOR = ;
+	const KEYWORD_VAR = ;
+	const KEYWORD_LET = ;
+	const KEYWORD_FUNC = ;
+	const KEYWORD_RETURN = ;
+	const KEYWORD_BREAK = ;
+	const KEYWORD_CONTINUE = ;
+	const KEYWORD_SWITCH = ;
+*/
+
 	public $type;
 	public $string;
 	public $line;

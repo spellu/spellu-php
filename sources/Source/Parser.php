@@ -3,9 +3,11 @@
 namespace Spellu\Source;
 
 use Spellu\SourceException;
+use Spellu\Dsl\Funcuit;
 
-class Parser
+class Parser implements Funcuit
 {
+	use Parser\Funcuit;
 	use Parser\Component;
 	use Parser\Statement;
 	use Parser\Expression;
