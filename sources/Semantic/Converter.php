@@ -5,6 +5,7 @@ namespace Spellu\Semantic;
 use Spellu\Platform\Environment;
 use Spellu\Source\Token;
 use Spellu\SyntaxTree\Node;
+use Spellu\SyntaxTree\Closure as ASTClosure;
 use PhpParser\BuilderFactory;
 use PhpParser\Node\Stmt as PHPStmt;
 use PhpParser\Node\Expr as PHPExpr;
@@ -44,9 +45,72 @@ class Converter
 		return $this->{'visit'.$node->type()}($node);
 	}
 
+	protected function convertNodeList($nodes)
+	{
+		$codes = [];
+
+		foreach ($nodes as $node) {
+			$codes[] = $this->visit($node);
+		}
+
+		return $codes;
+	}
+
+	protected function visitComponentConstant($node)
+	{
+	}
+
+	protected function visitComponentFunction($node)
+	{
+		$name = $node->name->string;
+		$parameters = $this->convertNodeList($node->parameters);
+		$statements = $this->convertNodeList($node->statements);
+
+		return new PHPStmt\Function_($name, [
+			'params' => $parameters,
+			'returnType' => null,
+			'stmts' => $statements,
+		]);
+	}
+
 	protected function visitComponentClass($node)
 	{
+		$extends = null;
+		$implements = [];
+		$includes = [];
 		$statements = [];
+
+		$resolver = new SymbolResolver($this->env);
+
+		foreach ($node->components as $component) {
+			$symbol = $resolver->resolveName($component);
+
+			if ($symbol instanceof SymbolClass) {
+				$extends = new PHPName(array_map(function ($token) {
+					return $token->string;
+				}, $component));
+			}
+			else if ($symbol instanceof SymbolInterface) {
+				$implements[] = new PHPName(array_map(function ($token) {
+					return $token->string;
+				}, $component));
+			}
+			else if ($symbol instanceof SymbolTrait) {
+				$name = new PHPName(array_map(function ($token) {
+					return $token->string;
+				}, $component));
+
+				$includes[] = new PHPStmt\UseUse($name, null);
+			}
+			else {
+				throw new SemanticException('not class, interface, trait');
+			}
+		}
+
+		if (count($includes) > 0) {
+			$statements[] = new PHPStmt\Use_($includes);
+		}
+
 		foreach ($node->members as $member) {
 			$statements[] = $this->visit($member);
 		}
@@ -62,8 +126,8 @@ class Converter
 
 		$class_stmt = new PHPStmt\Class_($class_token->string, [
 			'type' => 0,
-			'extends' => null,
-			'implements' => [],
+			'extends' => $extends,
+			'implements' => $implements,
 			'stmts' => $statements,
 		]);
 
@@ -78,19 +142,24 @@ class Converter
 		}
 	}
 
+/*
+	protected function resolveSymbol($tokens)
+	{
+		$resolver = new SymbolResolver($this->env);
+
+		$node = $resolver->resolve($node);
+
+		return $this->visit($node);
+	}
+*/
+
 	protected function visitComponentMethod($node)
 	{
-		$parameters = [];
-		foreach ($node->parameters as $parameter) {
-			$parameters[] = $this->visit($parameter);
-		}
+		$name = $node->name->string;
+		$parameters = $this->convertNodeList($node->parameters);
+		$statements = $this->convertNodeList($node->statements);
 
-		$statements = [];
-		foreach ($node->statements as $statement) {
-			$statements[] = $this->visit($statement);
-		}
-
-		return new PHPStmt\ClassMethod($node->name->string, [
+		return new PHPStmt\ClassMethod($name, [
 			'type' => 0,
 			'byRef' => false,
 			'params' => $parameters,
@@ -108,31 +177,55 @@ class Converter
 		return new PHPParameter($node->name->string, $default, $type);
 	}
 
-	protected function visitStmtBind($node)
+	protected function visitStatementBind($node)
 	{
+		$name = $node->name->string;
 		$expr = $this->visit($node->expr);
-		return new PHPExpr\Assign(new PHPExpr\Variable($node->name->string), $expr);
+
+		return new PHPExpr\Assign(new PHPExpr\Variable($name), $expr);
 	}
 
-	protected function visitStmtExpr($node)
+	protected function visitStatementReturn($node)
+	{
+//var_dump($node);
+		$expr = $this->visit($node->expr);
+
+		return new PHPStmt\Return_($expr);
+	}
+
+	protected function visitStatementExpression($node)
 	{
 		return $this->visit($node->expr);
 	}
 
-	protected function visitExprBinary($node)
+	protected function visitExpressionBinary($node)
 	{
 		$left = $this->visit($node->left);
 		$right = $this->visit($node->right);
+		// TODO
 		return new PHPExpr\BinaryOp\Plus($left, $right);
 	}
 
 	protected function visitTerm($node)
 	{
-		$resolver = new SymbolResolver($this->env, []);
+		if ($node->object instanceof ASTClosure) {
+			$code = $this->visitClosure($node->object);
 
-		$node = $resolver->resolve($node);
+			$postfix = $node->postfix;
+			while ($postfix) {
+				$code = $this->visitTermPostfix($code, $postfix);
+				$postfix = $postfix->next;
+			}
 
-		return $this->visit($node);
+			return $code;
+		}
+		else {
+			$resolver = new SymbolResolver($this->env);
+
+			$node = $resolver->resolve($node);
+
+			return $this->visit($node);
+		}
 	}
 
 	protected function visitSymbol($node)
@@ -290,5 +383,20 @@ var_dump(4, $code);
 	protected function visitLiteralDictionary($node)
 	{
 		echo __METHOD__, PHP_EOL;
+	}
+
+	protected function visitClosure($node)
+	{
+		assert($node->name === null);
+
+		$parameters = $this->convertNodeList($node->parameters);
+		$statements = $this->convertNodeList($node->statements);
+
+		return new PHPExpr\Closure([
+			'params' => $parameters,
+			'uses' => [],
+			'returnType' => null,
+			'stmts' => $statements,
+		]);
 	}
 }

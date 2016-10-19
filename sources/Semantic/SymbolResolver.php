@@ -8,12 +8,31 @@ use Spellu\SemanticException;
 
 class SymbolResolver
 {
-
-	public function __construct($env, $frame)
+	public function __construct($env, $frame = []/*TODO*/)
 	{
 		$this->env = $env;
 		$this->frame = $frame;
 		$this->symbol = null;
+	}
+
+	public function resolveName(array $tokens)
+	{
+		$symbol = null;
+
+		foreach ($tokens as $token) {
+			if ($symbol === null) {
+				$symbol = $this->searchName($token->string);
+				if ($symbol === null) return null;
+			}
+			else if ($symbol instanceof SymbolNamespace) {
+				$symbol = $this->searchInNamespace($symbol, $token->string);
+			}
+			else if ($symbol instanceof SymbolClass) {
+				$symbol = $this->searchInClass($symbol, $token->string);
+			}
+		}
+
+		return $symbol;
 	}
 
 	public function resolve(Term $node)
@@ -51,6 +70,23 @@ class SymbolResolver
 	{
 		$name = $node->token->string;
 
+		$symbol = $this->searchName($name);
+
+		if ($symbol === null) {
+			// TODO: search in local frames
+			return $this->symbol = new SymbolVariable($node);
+		}
+
+		return $symbol;
+	}
+
+	protected function visitLiteral($node)
+	{
+		return new SymbolLiteral($node);
+	}
+
+	protected function searchName($name)
+	{
 		if ($reflection = $this->env->asClass($name)) {
 			return $this->makeSymbol($reflection);
 		}
@@ -63,14 +99,7 @@ class SymbolResolver
 		if ($reflection = $this->env->asNamespace($name)) {
 			return $this->makeSymbol($reflection);
 		}
-		else {
-			return $this->symbol = new SymbolVariable($node);
-		}
-	}
-
-	protected function visitLiteral($node)
-	{
-		return new SymbolLiteral($node);
+		return null;
 	}
 
 	protected function searchInNamespace($symbol, $name)

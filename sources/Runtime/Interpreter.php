@@ -8,6 +8,8 @@ use Spellu\Source\Token;
 
 class Interpreter extends Visitor
 {
+	use Interpreter\Operation;
+
 	protected $machine;
 	protected $operator;
 

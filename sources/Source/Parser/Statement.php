@@ -17,14 +17,25 @@ trait Statement
 
 			$left = $this->token;
 
-			if (! $this->nextTokenIf(Token::EQUAL)) {
+			if (! $this->nextTokenIfOperator('=')) {
 				throw new SourceException('Expected =');
 			}
 
-			$node = new SyntaxTree\StmtBind($left, $this->parseExpression());
+			$node = new SyntaxTree\StatementBind($left, $this->parseExpression());
+		}
+		else if ($this->nextTokenIfWord('if')) {
+		}
+		else if ($this->nextTokenIfWord('do')) {
+		}
+		else if ($this->nextTokenIfWord('while')) {
+		}
+		else if ($this->nextTokenIfWord('for')) {
+		}
+		else if ($this->nextTokenIfWord('return')) {
+			$node = new SyntaxTree\StatementReturn($this->parseExpression());
 		}
 		else {
-			$node = new SyntaxTree\StmtExpr($this->parseExpression());
+			$node = new SyntaxTree\StatementExpression($this->parseExpression());
 		}
 
 		while ($this->nextTokenIf(Token::SEMICOLON)) {

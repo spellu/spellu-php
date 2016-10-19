@@ -82,22 +82,14 @@ class Lexer
 					return $this->stream->nextIf('.') ? Token::PERIOD3 : Token::PERIOD2;
 				}
 				return Token::PERIOD;
-			case '+': return Token::PLUS;
-			case '-': return Token::MINUS;
-			case '*': return Token::ASTERISK;
 			case '/':
 				if ($this->stream->nextIf('/')) return $this->consumeLineComment();
 				if ($this->stream->nextIf('*')) return $this->consumeBlockComment();
 				return Token::SLASH;
-			case '*': return Token::ASTERISK;
-			case '%': return Token::PERCENT;
-			case '?': return Token::QUESTION;
-			case '!': return Token::EXCLAMATION;
-			case '&': return Token::AMPERSAND;
 			case ',': return Token::COMMA;
 			case ':': return Token::COLON;
 			case ';': return Token::SEMICOLON;
-			case '=': return Token::EQUAL;
+			case '(': return Token::L_PAREN;
 			case '(': return Token::L_PAREN;
 			case ')': return Token::R_PAREN;
 			case '[': return Token::L_BRACKET;
@@ -109,10 +101,16 @@ class Lexer
 			default:
 				if ($ch >= '0' && $ch <= '9') return $this->consumeNumber();
 				if ($ch == '$' || $ch == '_' || ($ch >= 'a' && $ch <= 'z') || ($ch >= 'A' && $ch <= 'Z')) return $this->consumeWord();
+				if ($this->isOperatorSign($ch)) return $this->consumeOperator();
 
 				// Error: Illegal Character
-				throw new SourceException('Illegal Character');
+				throw new SourceException('Illegal Character'.$ch);
 		}
+	}
+
+	protected function isOperatorSign($ch)
+	{
+		return in_array($ch, Token::OPERATOR_SIGNS);
 	}
 
 	protected function consumeSpace()
@@ -161,6 +159,14 @@ class Lexer
 	{
 		if ($this->stream->skipTo('/[0-9a-zA-Z_]*/')) {
 			return Token::WORD;
+		}
+		assert(false);
+	}
+
+	protected function consumeOperator()
+	{
+		if ($this->stream->skipTo('/[\\=\\-\\+\\!\\*\\/\\%\\<\\>\\&\\|\\^\\?\\~\\/]*/')) {
+			return Token::OPERATOR;
 		}
 		assert(false);
 	}

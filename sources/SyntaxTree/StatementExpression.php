@@ -2,7 +2,7 @@
 
 namespace Spellu\SyntaxTree;
 
-class StmtExpr extends Stmt
+class StatementExpression extends Statement
 {
 	public $expr;
 
