@@ -234,10 +234,7 @@ class GeneratorTests extends TestCase
 	/** @test */
 	function class_1()
 	{
-		$source = <<<EOS
-class ABC {
-}
-EOS;
+		$source = 'class ABC {}';
 		$script = <<<EOS
 class ABC
 {
@@ -250,10 +247,7 @@ EOS;
 	/** @test */
 	function class_2()
 	{
-		$source = <<<EOS
-class ABC.DEF {
-}
-EOS;
+		$source = 'class ABC.DEF {}';
 		$script = <<<EOS
 namespace ABC {
     class DEF
@@ -268,10 +262,7 @@ EOS;
 	/** @test */
 	function class_3()
 	{
-		$source = <<<EOS
-class ABC.DEF.GHI {
-}
-EOS;
+		$source = 'class ABC.DEF.GHI {}';
 		$script = <<<EOS
 namespace ABC\DEF {
     class GHI
