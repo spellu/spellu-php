@@ -5,7 +5,7 @@ namespace Spellu\Source;
 use Spellu\SourceException;
 use Spellu\Dsl\Funcuit;
 
-class Parser implements Funcuit
+class Parser extends Funcuit
 {
 	use Parser\Funcuit;
 	use Parser\Component;
